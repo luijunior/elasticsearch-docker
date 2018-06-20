@@ -1,0 +1,27 @@
+version: '3'
+services:
+  elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.3
+      container_name: elasticsearch
+      environment: ['http.host=0.0.0.0', 'transport.host=127.0.0.1', 'TZ=America/Sao_Paulo']
+      ports: ['0.0.0.0:9200:9200']
+      networks: ['elk']
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.2.3
+    container_name: kibana
+    environment: ['TZ=America/Sao_Paulo']
+    ports: ['0.0.0.0:5601:5601']
+    networks: ['elk']
+    depends_on: ['elasticsearch']
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:6.2.3
+    container_name: logstash
+    environment: ['TZ=America/Sao_Paulo']
+    volumes:
+      - ./logstash/pipeline/:/usr/share/logstash/pipeline/
+      - ./elastic-sample-logs/:/logs/
+    networks: ['elk']
+    depends_on: ['elasticsearch']
+networks:
+  elk:
